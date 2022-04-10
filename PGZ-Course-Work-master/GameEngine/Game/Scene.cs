@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using AmazingUILibrary;
 using AmazingUILibrary.Containers;
@@ -101,7 +102,7 @@ namespace GameEngine.Game
             gameObject.Dispose();
         }
 
-        public void Update(float delta)
+        public virtual void Update(float delta)
         {
             AddGameObjects();
             foreach (Game3DObject gameObject in _gameObjects)

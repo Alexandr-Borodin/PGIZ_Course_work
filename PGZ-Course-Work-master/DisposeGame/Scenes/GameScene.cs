@@ -18,6 +18,7 @@ using SharpDX;
 using SharpDX.Mathematics.Interop;
 using Sound;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace DisposeGame.Scenes
@@ -40,10 +41,32 @@ namespace DisposeGame.Scenes
         private SharpAudioVoice _zombieDeathSound;
         private SharpAudioVoice _zombieHitedSound;
 
+        private Stopwatch _stopwatch;
+        private float _spawnTimeOffset;
+
+        private Loader _loader;
+
         public int TotalEnemies { get; set; }
+
+        public GameScene()
+        {
+            _stopwatch = new Stopwatch();
+            _spawnTimeOffset = 3.0f;
+        }
+
+        public override void Update(float delta)
+        {
+            base.Update(delta);
+            if(_stopwatch.Elapsed.TotalSeconds >= _spawnTimeOffset)
+            {
+                _stopwatch.Restart();
+                AddGameObject(CreateObstacle(_loader, new Vector3(100, -50, -110)));
+            }
+        }
 
         protected override void InitializeObjects(Loader loader, SharpAudioDevice audioDevice)
         {
+            _loader = loader;
             _camera = new OrthoCamera(new Vector3(0, 20, -20), rotY: MathUtil.Pi / 4f, fovY: 0.1f);
 
             _bonusPickedSound = new SharpAudioVoice(audioDevice, @"Sounds\BonusPicked.wav");
@@ -93,6 +116,8 @@ namespace DisposeGame.Scenes
             AddGameObject(CreateObstacle(loader, new Vector3(100, -50, -110)));
 
             AddGameObject(_rooms);
+
+            _stopwatch.Start();
         }
 
         private Game3DObject CreateHealthBonus(Loader loader, Vector3 position)
@@ -104,7 +129,7 @@ namespace DisposeGame.Scenes
 
         private Game3DObject CreateObstacle(Loader loader, Vector3 position)
         {
-            var obstacle = CreateObtsacle(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\PGZ-Course-Work-master\DisposeGame\Models\cube.fbx", new EnvironmentScript(Vector3.UnitY, 0.5f));
+            var obstacle = CreateObtsacle(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\PGZ-Course-Work-master\DisposeGame\Models\cube.fbx", new EnvironmentScript(Vector3.UnitY, 1.0f, 15f));
             obstacle.MoveTo(position);
             return obstacle;
         }
