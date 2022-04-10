@@ -28,7 +28,6 @@ namespace DisposeGame.Scenes
         private Camera _camera;
 
         private Game3DObject _player;
-        private Game3DObject _rooms;
 
         private UIProgressBar _healthBar;
         private UIText _ammoCounter;
@@ -77,45 +76,10 @@ namespace DisposeGame.Scenes
             _zombieDeathSound = new SharpAudioVoice(audioDevice, @"Sounds\ZombieDeath.wav");
             _zombieHitedSound = new SharpAudioVoice(audioDevice, @"Sounds\ZombieHited.wav");
 
-            _rooms = CreateLevel(loader);
-
             _player = CreatePlayer(loader);
             _player.MoveTo(new Vector3(100, 10, -100));
 
             AddGameObject(_player);
-
-            AddGameObject(CreateZombie(loader, new Vector3(70, 0, 90)));
-
-            AddGameObject(CreateZombie(loader, new Vector3(165, 0, 165)));
-            AddGameObject(CreateZombie(loader, new Vector3(180, 0, 90)));
-            AddGameObject(CreateZombie(loader, new Vector3(230, 0, 130)));
-
-            AddGameObject(CreateZombie(loader, new Vector3(165, 0, 0)));
-            AddGameObject(CreateZombie(loader, new Vector3(200, 0, 0)));
-            AddGameObject(CreateZombie(loader, new Vector3(240, 0, 0)));
-            AddGameObject(CreateZombie(loader, new Vector3(205, 0, -30)));
-            AddGameObject(CreateZombie(loader, new Vector3(180, 0, -30)));
-
-            AddGameObject(CreateZombie(loader, new Vector3(70, 0, 190)));
-            AddGameObject(CreateZombie(loader, new Vector3(90, 0, 240)));
-
-            AddGameObject(CreateZombie(loader, new Vector3(170, 0, 295)));
-            AddGameObject(CreateZombie(loader, new Vector3(230, 0, 275)));
-
-            AddGameObject(CreateZombie(loader, new Vector3(300, 0, 150)));
-            AddGameObject(CreateZombie(loader, new Vector3(300, 0, 35)));
-
-            AddGameObject(CreateAmmoBonus(loader, new Vector3(15, 0, 105)));
-            AddGameObject(CreateHealthBonus(loader, new Vector3(15, 0, 80)));
-            AddGameObject(CreateInvisibilityBonus(loader, new Vector3(120, 0, 80)));
-
-            AddGameObject(CreateAmmoBonus(loader, new Vector3(200, 0, 40)));
-            AddGameObject(CreateAmmoBonus(loader, new Vector3(220, 0, 40)));
-            AddGameObject(CreateHealthBonus(loader, new Vector3(180, 0, 40)));
-
-            AddGameObject(CreateObstacle(loader, new Vector3(100, -50, -110)));
-
-            AddGameObject(_rooms);
 
             _stopwatch.Start();
         }
@@ -261,11 +225,7 @@ namespace DisposeGame.Scenes
                 head.SetRotationZ(0);
             });
 
-            var physics = new PhysicsComponent(_rooms.Children);
-            body.AddComponent(physics);
-            body.AddScript(new PhysicsScript(physics));
-
-            var movementScript = new PlayerMovementScript(characterMovementAnimation, physics, _rooms.Children);
+            var movementScript = new PlayerMovementScript(characterMovementAnimation);
             movementScript.OnJump += () => _heroJump.Play();
             body.AddScript(movementScript);
 
@@ -301,7 +261,7 @@ namespace DisposeGame.Scenes
 
             body.AddScript(new PlayerUnbreakableScript(health));
 
-            gun.AddScript(new PlayerGunScript(bullet, ammo, _rooms.Children));
+            gun.AddScript(new PlayerGunScript(bullet, ammo, null));
 
             body.Collision = new BoxCollision(5, 20);
 
@@ -339,7 +299,7 @@ namespace DisposeGame.Scenes
             });
 
             body.Collision = new BoxCollision(5, 20);
-            body.AddScript(new ZombieMovementScript(_player, movementAnimation, _rooms.Children));
+            body.AddScript(new ZombieMovementScript(_player, movementAnimation, null));
             var health = new HealthComponent(30);
             health.OnDeath += () =>
             {

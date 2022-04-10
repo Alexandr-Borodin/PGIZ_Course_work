@@ -8,19 +8,17 @@ namespace DisposeGame.Scripts.Character
 {
     public class CharacterMovement
     {
-        private List<Game3DObject> _walls;
         private float _speed;
         private Animation _animation;
         private bool _isAnimationPaused;
 
 
-        public CharacterMovement(Animation animation, float speed, List<Game3DObject> walls)
+        public CharacterMovement(Animation animation, float speed)
         {
             _speed = speed;
             _animation = animation;
             _animation.Pause();
             _isAnimationPaused = true;
-            _walls = walls;
         }
 
         public void Move(Game3DObject character, Vector3 direction, float delta)
@@ -54,31 +52,6 @@ namespace DisposeGame.Scripts.Character
             var partX = direction * Vector3.UnitX;
             var partY = direction * Vector3.UnitY;
             var partZ = direction * Vector3.UnitZ;
-
-            foreach (var gameObject in _walls)
-            {
-                if (ObjectCollision.Intersects(character.Collision, gameObject.Collision))
-                {
-                    character.MoveBy(-partX);
-                    if (!ObjectCollision.Intersects(character.Collision, gameObject.Collision))
-                    {
-                        continue;
-                    }
-                    character.MoveBy(partX);
-                    character.MoveBy(-partY);
-                    if (!ObjectCollision.Intersects(character.Collision, gameObject.Collision))
-                    {
-                        continue;
-                    }
-                    character.MoveBy(partY);
-                    character.MoveBy(-partZ);
-                    if (!ObjectCollision.Intersects(character.Collision, gameObject.Collision))
-                    {
-                        continue;
-                    }
-                    character.MoveBy(partZ);
-                }
-            }
         }
     }
 }
