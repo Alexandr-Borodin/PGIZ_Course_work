@@ -7,6 +7,7 @@ using DisposeGame.Components;
 using DisposeGame.Scripts;
 using DisposeGame.Scripts.Bonuses;
 using DisposeGame.Scripts.Character;
+using DisposeGame.Scripts.Environment;
 using GameEngine.Animation;
 using GameEngine.Collisions;
 using GameEngine.Game;
@@ -42,7 +43,7 @@ namespace DisposeGame.Scenes
 
         protected override void InitializeObjects(Loader loader, SharpAudioDevice audioDevice)
         {
-            _camera = new OrthoCamera(new Vector3(0, 20, -20), rotY: MathUtil.Pi / 4f, fovY: 0.1f);
+            _camera = new Camera(new Vector3(0, 22, -100), rotY: 0.20f, fovY: 0.1f);
 
             _bonusPickedSound = new SharpAudioVoice(audioDevice, @"Sounds\BonusPicked.wav");
             _heroDeathSound = new SharpAudioVoice(audioDevice, @"Sounds\HeroDeath.wav");
@@ -88,6 +89,8 @@ namespace DisposeGame.Scenes
             AddGameObject(CreateAmmoBonus(loader, new Vector3(220, 0, 40)));
             AddGameObject(CreateHealthBonus(loader, new Vector3(180, 0, 40)));
 
+            AddGameObject(CreateRoad(loader, new Vector3(100, 0, -110)));
+
             AddGameObject(_rooms);
         }
 
@@ -96,6 +99,13 @@ namespace DisposeGame.Scenes
             var health = CreateBonus(loader, @"Models\BonusHeart.fbx", new HealthBonusScript(_player));
             health.MoveTo(position);
             return health;
+        }
+
+        private Game3DObject CreateRoad(Loader loader, Vector3 position)
+        {
+            var road = CreateEnvironment(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\road2.fbx", new EnvironmentScript(Vector3.UnitY, 0.0f, 15f));
+            road.MoveTo(position);
+            return road;
         }
 
         private Game3DObject CreateAmmoBonus(Loader loader, Vector3 position)
@@ -116,6 +126,7 @@ namespace DisposeGame.Scenes
         {
             var bonus = loader.LoadGameObjectFromFile(path, Vector3.Zero, Vector3.Zero);
             bonus.Collision = new SphereCollision(2);
+            bonus.Children[0].SetRotationZ(-MathUtil.PiOverTwo);
             var animation = new SmoothAnimation(new float[] { 0, MathUtil.TwoPi, 0 }, 1, int.MaxValue);
             animation.AddProcess(value => 
             {
@@ -129,6 +140,13 @@ namespace DisposeGame.Scenes
             };
             bonus.AddScript(script);
             return bonus;
+        }
+
+        private Game3DObject CreateEnvironment(Loader loader, string path, EnvironmentScript script)
+        {
+            var environment = loader.LoadGameObjectFromFile(path, Vector3.Zero, Vector3.Zero);
+            environment.AddScript(script);
+            return environment;
         }
 
         private Game3DObject CreateLevel(Loader loader)
@@ -157,15 +175,10 @@ namespace DisposeGame.Scenes
 
         private Game3DObject LoadPersonWithTexture(
             Loader loader, 
-            string texture,
-            out Game3DObject leftArm,
-            out Game3DObject rightArm,
-            out Game3DObject leftLeg,
-            out Game3DObject rightLeg,
-            out Game3DObject head)
+            string texture)
         {
-            var body = loader.LoadGameObjectFromFile(@"Models\person.fbx", Vector3.Zero, Vector3.Zero, texture);
-            body.Children[0].SetRotationZ(-MathUtil.PiOverTwo);
+            var body = loader.LoadGameObjectFromFile(@"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\mainCar61.fbx", Vector3.Zero, new Vector3(0, 0, 0));
+            /*body.Children[0].SetRotationZ(-MathUtil.PiOverTwo);
 
             body.Children[0].Children[0].IsHidden = true;
             body.Children[0].Children[1].IsHidden = true;
@@ -177,19 +190,14 @@ namespace DisposeGame.Scenes
             rightArm = body.Children[0].Children[1].Children[0];
             leftLeg = body.Children[0].Children[2].Children[0];
             rightLeg = body.Children[0].Children[3].Children[0];
-            head = body.Children[0].Children[4].Children[0];
+            head = body.Children[0].Children[4].Children[0];*/
 
             return body;
         }
 
         private Game3DObject CreatePlayer(Loader loader)
         {
-            var body = LoadPersonWithTexture(loader, @"Textures\gachi.png",
-                out Game3DObject leftArm,
-                out Game3DObject rightArm,
-                out Game3DObject leftLeg,
-                out Game3DObject rightLeg, 
-                out Game3DObject head);
+            var body = LoadPersonWithTexture(loader, @"Textures\gachi.png");
 
             body.AddChild(_camera);
 
@@ -197,12 +205,12 @@ namespace DisposeGame.Scenes
             var bullet = loader.MakeRectangle(Vector3.Zero, Vector3.Zero, Vector3.One * 0.2f);
             bullet.Collision = new SphereCollision(1);
 
-            rightArm.AddChild(gun);
+            //rightArm.AddChild(gun);
 
-            rightArm.SetRotationX(MathUtil.PiOverTwo);
+            //rightArm.SetRotationX(MathUtil.PiOverTwo);
 
             var characterMovementAnimation = new Animation(new float[] { 0, MathUtil.PiOverFour, 0, -MathUtil.PiOverFour, 0 }, 1, int.MaxValue);
-            characterMovementAnimation.AddProcess(value =>
+            /*characterMovementAnimation.AddProcess(value =>
             {
                 leftLeg.SetRotationX(value);
                 rightLeg.SetRotationX(-value);
@@ -215,7 +223,7 @@ namespace DisposeGame.Scenes
                 rightLeg.SetRotationX(0);
                 leftArm.SetRotationX(0);
                 head.SetRotationZ(0);
-            });
+            });*/
 
             var physics = new PhysicsComponent(_rooms.Children);
             body.AddComponent(physics);
@@ -266,24 +274,19 @@ namespace DisposeGame.Scenes
 
         private Game3DObject CreateZombie(Loader loader, Vector3 position)
         {
-            var body = LoadPersonWithTexture(loader, @"Textures\zombienew.png",
-                out Game3DObject leftArm,
-                out Game3DObject rightArm,
-                out Game3DObject leftLeg,
-                out Game3DObject rightLeg,
-                out Game3DObject head);
+            var body = LoadPersonWithTexture(loader, @"Textures\zombienew.png");
 
 
             Animation zombieIdleAnimation = new Animation(new float[] { 0, MathUtil.Pi / 16f, 0, -MathUtil.Pi / 16f, 0 }, 1, int.MaxValue);
-            zombieIdleAnimation.AddProcess(value =>
+            /*zombieIdleAnimation.AddProcess(value =>
             {
                 head.SetRotationZ(value);
                 head.SetRotationX(value);
                 leftArm.SetRotationX(value + MathUtil.PiOverTwo);
                 rightArm.SetRotationX(-value + MathUtil.PiOverTwo);
-            });
+            });*/
             Animation movementAnimation = new Animation(new float[] { 0, MathUtil.PiOverFour, 0, -MathUtil.PiOverFour, 0 }, 1, int.MaxValue);
-            movementAnimation.AddProcess(value =>
+            /*movementAnimation.AddProcess(value =>
             {
                 leftLeg.SetRotationX(value);
                 rightLeg.SetRotationX(-value);
@@ -292,7 +295,7 @@ namespace DisposeGame.Scenes
             {
                 leftLeg.SetRotationX(0);
                 rightLeg.SetRotationX(0);
-            });
+            });*/
 
             body.Collision = new BoxCollision(5, 20);
             body.AddScript(new ZombieMovementScript(_player, movementAnimation, _rooms.Children));

@@ -108,6 +108,7 @@
     <Compile Include="Scripts\Character\ZombieMovementScript.cs" />
     <Compile Include="Scripts\DinoClickScript.cs" />
     <Compile Include="Scripts\DinoMovementScript.cs" />
+    <Compile Include="Scripts\Environment\EnvironmentScript.cs" />
     <Compile Include="Scripts\PhysicsScript.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
