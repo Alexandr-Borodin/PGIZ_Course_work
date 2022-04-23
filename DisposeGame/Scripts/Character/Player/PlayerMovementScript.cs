@@ -42,7 +42,7 @@ namespace DisposeGame.Scripts.Character
 
             _inputController = InputController.GetInstance();
 
-            _movement = new CharacterMovement(animation, speed, walls);
+            _movement = new CharacterMovement(animation, speed/*, walls*/);
 
         }
 

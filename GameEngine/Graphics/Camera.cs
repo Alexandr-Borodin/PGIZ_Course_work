@@ -51,6 +51,11 @@ namespace GameEngine.Graphics
             Vector3 viewUp = (Vector3)Vector4.Transform(Vector4.UnitY, rotation);
             return Matrix.LookAtLH(Position, Position + viewTo, viewUp);
         }
+
+        public override void Update(float delta)
+        {
+            base.Update(delta);
+        }
     }
 
 }

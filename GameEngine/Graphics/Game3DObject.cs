@@ -109,7 +109,7 @@ namespace GameEngine.Graphics
             return _components[key] as T;
         }
 
-        public void Update(float delta)
+        public virtual void Update(float delta)
         {
             AddScripts();
             foreach (Script script in _scripts)

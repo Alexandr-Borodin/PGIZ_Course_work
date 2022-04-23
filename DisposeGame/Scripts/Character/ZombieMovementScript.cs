@@ -27,7 +27,7 @@ namespace DisposeGame.Scripts.Character
         {
             _target = target;
             _radius = radius;
-            _movement = new CharacterMovement(animation, speed, walls);
+            _movement = new CharacterMovement(animation, speed/*, walls*/);
             _damage = damage;
 
             _targetHealth = _target.GetComponent<HealthComponent>();

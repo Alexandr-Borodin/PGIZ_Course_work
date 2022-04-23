@@ -104,7 +104,7 @@ namespace GameEngine.Game
                     Texture2D = new ShaderResourceViewDescription.Texture2DResource
                     {
                         MostDetailedMip = 0,
-                        MipLevels = (generateMips ? mipLevels : 1)
+                        MipLevels = 1 //(generateMips ? mipLevels : 1)
                     }
                 };
             ShaderResourceView shaderResourceView =

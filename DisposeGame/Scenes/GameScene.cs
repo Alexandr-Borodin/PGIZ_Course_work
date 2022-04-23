@@ -16,6 +16,7 @@ using GameEngine.Scripts;
 using SharpDX;
 using SharpDX.Mathematics.Interop;
 using Sound;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -28,6 +29,11 @@ namespace DisposeGame.Scenes
         private Game3DObject _player;
         private Game3DObject _rooms;
 
+        private List<Game3DObject> _roads;
+        private const float _roadOffset = 34.4f;
+        private const float _roadDestroyBorder = -144.8f;
+        private const float _groundSpawnCoordZ = -5.6f;
+
         private UIProgressBar _healthBar;
         private UIText _ammoCounter;
 
@@ -39,10 +45,18 @@ namespace DisposeGame.Scenes
         private SharpAudioVoice _zombieDeathSound;
         private SharpAudioVoice _zombieHitedSound;
 
+        private Loader _loader;
+
         public int TotalEnemies { get; set; }
+
+        public override void Update(float delta)
+        {
+            base.Update(delta);
+        }
 
         protected override void InitializeObjects(Loader loader, SharpAudioDevice audioDevice)
         {
+            _loader = loader;
             _camera = new Camera(new Vector3(0, 22, -100), rotY: 0.20f, fovY: 0.1f);
 
             _bonusPickedSound = new SharpAudioVoice(audioDevice, @"Sounds\BonusPicked.wav");
@@ -56,30 +70,30 @@ namespace DisposeGame.Scenes
             _rooms = CreateLevel(loader);
 
             _player = CreatePlayer(loader);
-            _player.MoveTo(new Vector3(100, 10, -100));
+            _player.MoveTo(new Vector3(100, 1, -100));
 
             AddGameObject(_player);
 
-            AddGameObject(CreateZombie(loader, new Vector3(70, 0, 90)));
+            //AddGameObject(CreateZombie(loader, new Vector3(70, 0, 90)));
 
-            AddGameObject(CreateZombie(loader, new Vector3(165, 0, 165)));
-            AddGameObject(CreateZombie(loader, new Vector3(180, 0, 90)));
-            AddGameObject(CreateZombie(loader, new Vector3(230, 0, 130)));
+            //AddGameObject(CreateZombie(loader, new Vector3(165, 0, 165)));
+            //AddGameObject(CreateZombie(loader, new Vector3(16.660, 0, 90)));
+            //AddGameObject(CreateZombie(loader, new Vector3(230, 0, 130)));
 
-            AddGameObject(CreateZombie(loader, new Vector3(165, 0, 0)));
-            AddGameObject(CreateZombie(loader, new Vector3(200, 0, 0)));
-            AddGameObject(CreateZombie(loader, new Vector3(240, 0, 0)));
-            AddGameObject(CreateZombie(loader, new Vector3(205, 0, -30)));
-            AddGameObject(CreateZombie(loader, new Vector3(180, 0, -30)));
+            //AddGameObject(CreateZombie(loader, new Vector3(165, 0, 0)));
+            //AddGameObject(CreateZombie(loader, new Vector3(200, 0, 0)));
+            //AddGameObject(CreateZombie(loader, new Vector3(240, 0, 0)));
+            //AddGameObject(CreateZombie(loader, new Vector3(205, 0, -30)));
+            //AddGameObject(CreateZombie(loader, new Vector3(16.660, 0, -30)));
 
-            AddGameObject(CreateZombie(loader, new Vector3(70, 0, 190)));
-            AddGameObject(CreateZombie(loader, new Vector3(90, 0, 240)));
+            //AddGameObject(CreateZombie(loader, new Vector3(70, 0, 190)));
+            //AddGameObject(CreateZombie(loader, new Vector3(90, 0, 240)));
 
-            AddGameObject(CreateZombie(loader, new Vector3(170, 0, 295)));
-            AddGameObject(CreateZombie(loader, new Vector3(230, 0, 275)));
+            //AddGameObject(CreateZombie(loader, new Vector3(16.660, 0, 295)));
+            //AddGameObject(CreateZombie(loader, new Vector3(230, 0, 275)));
 
-            AddGameObject(CreateZombie(loader, new Vector3(300, 0, 150)));
-            AddGameObject(CreateZombie(loader, new Vector3(300, 0, 35)));
+            //AddGameObject(CreateZombie(loader, new Vector3(300, 0, 150)));
+            //AddGameObject(CreateZombie(loader, new Vector3(300, 0, 35)));
 
             AddGameObject(CreateAmmoBonus(loader, new Vector3(15, 0, 105)));
             AddGameObject(CreateHealthBonus(loader, new Vector3(15, 0, 80)));
@@ -87,11 +101,39 @@ namespace DisposeGame.Scenes
 
             AddGameObject(CreateAmmoBonus(loader, new Vector3(200, 0, 40)));
             AddGameObject(CreateAmmoBonus(loader, new Vector3(220, 0, 40)));
-            AddGameObject(CreateHealthBonus(loader, new Vector3(180, 0, 40)));
+            //AddGameObject(CreateHealthBonus(loader, new Vector3(16.660, 0, 40)));
 
-            AddGameObject(CreateRoad(loader, new Vector3(100, 0, -110)));
+            _roads = new List<Game3DObject>();
+            var roadOne = CreateRoad(loader, new Vector3(100, 0, -110));
+            var grassOneLeft = CreateGrass(loader, new Vector3(roadOne.Position.X - 16.66f, roadOne.Position.Y, roadOne.Position.Z));
+            var grassOneRight = CreateGrass(loader, new Vector3(roadOne.Position.X + 16.66f, roadOne.Position.Y, roadOne.Position.Z));
+            _roads.Add(roadOne);
+            var roadTwo = CreateRoad(loader, new Vector3(100, 0, -75.2f));
+            var grassTwoLeft = CreateGrass(loader, new Vector3(roadTwo.Position.X - 16.66f, roadTwo.Position.Y, roadTwo.Position.Z));
+            var grassTwoRight = CreateGrass(loader, new Vector3(roadTwo.Position.X + 16.66f, roadTwo.Position.Y, roadTwo.Position.Z));
+            _roads.Add(roadTwo);
+            var roadThree = CreateRoad(loader, new Vector3(100, 0, -40.4f));
+            var grassThreeLeft = CreateGrass(loader, new Vector3(roadThree.Position.X - 16.66f, roadThree.Position.Y, roadThree.Position.Z));
+            var grassThreeRight = CreateGrass(loader, new Vector3(roadThree.Position.X + 16.66f, roadThree.Position.Y, roadThree.Position.Z));
+            _roads.Add(roadThree);
+            var roadFour = CreateRoad(loader, new Vector3(100, 0, -5.6f));
+            var grassFourLeft = CreateGrass(loader, new Vector3(roadFour.Position.X - 16.66f, roadFour.Position.Y, roadFour.Position.Z));
+            var grassFourRight = CreateGrass(loader, new Vector3(roadFour.Position.X + 16.66f, roadFour.Position.Y, roadFour.Position.Z));
+            _roads.Add(roadFour);
 
-            AddGameObject(_rooms);
+            foreach (var road in _roads)
+            {
+                AddGameObject(road);
+            }
+
+            AddGameObject(grassOneLeft);
+            AddGameObject(grassOneRight);
+            AddGameObject(grassTwoLeft);
+            AddGameObject(grassTwoRight);
+            AddGameObject(grassThreeLeft);
+            AddGameObject(grassThreeRight);
+            AddGameObject(grassFourLeft);
+            AddGameObject(grassFourRight);
         }
 
         private Game3DObject CreateHealthBonus(Loader loader, Vector3 position)
@@ -103,9 +145,52 @@ namespace DisposeGame.Scenes
 
         private Game3DObject CreateRoad(Loader loader, Vector3 position)
         {
-            var road = CreateEnvironment(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\road2.fbx", new EnvironmentScript(Vector3.UnitY, 0.0f, 15f));
+            var environmentScript = new EnvironmentScript(Vector3.UnitZ, -0.5f, _roadDestroyBorder);
+            environmentScript.Destroy += RemoveRoad;
+            var road = CreateEnvironment(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\road9.fbx", environmentScript);
             road.MoveTo(position);
             return road;
+        }
+
+        private Game3DObject CreateGrass(Loader loader, Vector3 position)
+        {
+            var environmentScript = new EnvironmentScript(Vector3.UnitZ, -0.5f, _roadDestroyBorder);
+            environmentScript.Destroy += RemoveGrass;
+            var road = CreateEnvironment(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\grass4.fbx", environmentScript);
+            road.MoveTo(position);
+            return road;
+        }
+
+        private void RemoveRoad(Script sender, Game3DObject gameObject)
+        {
+            Game3DObject groundNearestToSpawnPoint = null;
+            var maxValue = float.MinValue;
+            foreach (var ground in _roads)
+            {
+                if (ground.Position.Z > maxValue)
+                {
+                    maxValue = ground.Position.Z;
+                    groundNearestToSpawnPoint = ground;
+                }
+            }
+            var newCoordZ = groundNearestToSpawnPoint.Position.Z + _roadOffset;
+            gameObject.MoveTo(new Vector3(gameObject.Position.X, gameObject.Position.Y, newCoordZ));
+        }
+
+        private void RemoveGrass(Script sender, Game3DObject gameObject)
+        {
+            Game3DObject groundNearestToSpawnPoint = null;
+            var maxValue = float.MinValue;
+            foreach (var ground in _roads)
+            {
+                if (ground.Position.Z > maxValue)
+                {
+                    maxValue = ground.Position.Z;
+                    groundNearestToSpawnPoint = ground;
+                }
+            }
+            var newCoordZ = groundNearestToSpawnPoint.Position.Z;
+            gameObject.MoveTo(new Vector3(gameObject.Position.X, gameObject.Position.Y, newCoordZ));
         }
 
         private Game3DObject CreateAmmoBonus(Loader loader, Vector3 position)
@@ -225,11 +310,11 @@ namespace DisposeGame.Scenes
                 head.SetRotationZ(0);
             });*/
 
-            var physics = new PhysicsComponent(_rooms.Children);
-            body.AddComponent(physics);
-            body.AddScript(new PhysicsScript(physics));
+            //var physics = new PhysicsComponent(_rooms.Children);
+            //body.AddComponent(physics);
+            //body.AddScript(new PhysicsScript(physics));
 
-            var movementScript = new PlayerMovementScript(characterMovementAnimation, physics, _rooms.Children);
+            var movementScript = new PlayerMovementScript(characterMovementAnimation, null, _rooms.Children);
             movementScript.OnJump += () => _heroJump.Play();
             body.AddScript(movementScript);
 
