@@ -49,11 +49,6 @@ namespace DisposeGame.Scripts.Character
         public override void Update(float delta)
         {
             base.Update(delta);
-
-            if (_inputController.MouseUpdate)
-            {
-                GameObject.RotateZ(delta * _mouseSensitivity * _inputController.MouseRelativePositionX);
-            }
         }
 
         protected override void BeforeKeyProcess(float delta)

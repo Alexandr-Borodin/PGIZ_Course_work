@@ -25,6 +25,7 @@ namespace GameEngine.Graphics
         public Game3DObject Parent { get => _parent; set => _parent = value; }
         public List<Game3DObject> Children { get => _children; }
         public MeshObject Mesh { get => _mesh; }
+        public float Speed { get; set; }
         public ObjectCollision Collision 
         { 
             get => _collision; 

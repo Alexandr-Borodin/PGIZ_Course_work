@@ -15,20 +15,21 @@ namespace DisposeGame.Scripts.Environment
     {
         private Vector3 _direction;
         private float _destroyBorder;
-        private float _speed;
 
         public event ScriptHandler Destroy;
+
+        public float Speed { get; set; }
 
         public EnvironmentScript(Vector3 direction, float speed, float destroyBorder)
         {
             _direction = direction;
-            _speed = speed;
+            Speed = speed;
             _destroyBorder = destroyBorder;
         }
 
         public override void Update(float delta)
         {
-            GameObject.MoveBy(_direction * _speed);
+            GameObject.MoveBy(_direction * GameObject.Speed);
 
             if (GameObject.Position.Z <= _destroyBorder)
             {

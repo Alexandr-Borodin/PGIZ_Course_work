@@ -7,6 +7,7 @@ using DisposeGame.Components;
 using DisposeGame.Scripts;
 using DisposeGame.Scripts.Bonuses;
 using DisposeGame.Scripts.Character;
+using DisposeGame.Scripts.Character.Player;
 using DisposeGame.Scripts.Environment;
 using GameEngine.Animation;
 using GameEngine.Collisions;
@@ -18,6 +19,7 @@ using SharpDX.Mathematics.Interop;
 using Sound;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace DisposeGame.Scenes
@@ -32,7 +34,13 @@ namespace DisposeGame.Scenes
         private List<Game3DObject> _roads;
         private const float _roadOffset = 34.4f;
         private const float _roadDestroyBorder = -144.8f;
-        private const float _groundSpawnCoordZ = -5.6f;
+
+        private const float _leftRoadBorder = 90f;
+        private const float _rightRoadBorder = 110f;
+
+        private List<Game3DObject> _obstacles;
+        private Stopwatch _timer;
+        private const int _spawnObstacleTime = 2;
 
         private UIProgressBar _healthBar;
         private UIText _ammoCounter;
@@ -46,12 +54,15 @@ namespace DisposeGame.Scenes
         private SharpAudioVoice _zombieHitedSound;
 
         private Loader _loader;
+        private Random _random = new Random();
 
         public int TotalEnemies { get; set; }
 
         public override void Update(float delta)
         {
             base.Update(delta);
+            CheckIIfPlayerOutsideOfRoad();
+            SpawnObstacle();
         }
 
         protected override void InitializeObjects(Loader loader, SharpAudioDevice audioDevice)
@@ -134,6 +145,20 @@ namespace DisposeGame.Scenes
             AddGameObject(grassThreeRight);
             AddGameObject(grassFourLeft);
             AddGameObject(grassFourRight);
+
+            _obstacles = new List<Game3DObject>();
+            var car1 = CreateOncomingCar(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\policecar2.fbx");
+            var car2 = CreateFollowingCar(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\policecar2.fbx");
+
+            _obstacles.Add(car1);
+            _obstacles.Add(car2);
+
+            AddGameObject(car1);
+            AddGameObject(car2);
+
+
+            _timer = new Stopwatch();
+            _timer.Start();
         }
 
         private Game3DObject CreateHealthBonus(Loader loader, Vector3 position)
@@ -143,12 +168,46 @@ namespace DisposeGame.Scenes
             return health;
         }
 
+        private Game3DObject CreateOncomingCar(Loader loader, string modelPath)
+        {
+            var environmentScript = new EnvironmentScript(Vector3.UnitZ, -1f, _roadDestroyBorder);
+            environmentScript.Destroy += FreeOncomingCar;
+            var car = CreateEnvironment(loader, modelPath, environmentScript);
+            var obstacleScript = new ObstacleScript(_player, 50);
+            obstacleScript.OnPicked += FreeOncomingCar;
+            car.AddScript(obstacleScript);
+            var position = new Vector3(96, 1, -90);
+            car.MoveTo(position);
+            car.RotateZ(MathUtil.DegreesToRadians(180));
+            car.Speed = -1f;
+            car.Collision = new BoxCollision(1.7f, 1);
+            car.AddComponent(new ObstacleInfoComponent { IsFree = true, OriginSpeed = -1f });
+            return car;
+        }
+
+        private Game3DObject CreateFollowingCar(Loader loader, string modelPath)
+        {
+            var environmentScript = new EnvironmentScript(Vector3.UnitZ, -0.4f, _roadDestroyBorder);
+            environmentScript.Destroy += FreeFollowingCar;
+            var car = CreateEnvironment(loader, modelPath, environmentScript);
+            var obstacleScript = new ObstacleScript(_player, 30);
+            obstacleScript.OnPicked += FreeFollowingCar;
+            car.AddScript(obstacleScript);
+            var position = new Vector3(106, 1, -90);
+            car.MoveTo(position);
+            car.Speed = -0.4f;
+            car.Collision = new BoxCollision(1.7f, 1);
+            car.AddComponent(new ObstacleInfoComponent { IsFree = true, OriginSpeed = -0.4f });
+            return car;
+        }
+
         private Game3DObject CreateRoad(Loader loader, Vector3 position)
         {
             var environmentScript = new EnvironmentScript(Vector3.UnitZ, -0.5f, _roadDestroyBorder);
             environmentScript.Destroy += RemoveRoad;
             var road = CreateEnvironment(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\road9.fbx", environmentScript);
             road.MoveTo(position);
+            road.Speed = -0.5f;
             return road;
         }
 
@@ -158,6 +217,7 @@ namespace DisposeGame.Scenes
             environmentScript.Destroy += RemoveGrass;
             var road = CreateEnvironment(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\grass4.fbx", environmentScript);
             road.MoveTo(position);
+            road.Speed = -0.5f;
             return road;
         }
 
@@ -175,6 +235,22 @@ namespace DisposeGame.Scenes
             }
             var newCoordZ = groundNearestToSpawnPoint.Position.Z + _roadOffset;
             gameObject.MoveTo(new Vector3(gameObject.Position.X, gameObject.Position.Y, newCoordZ));
+        }
+
+        private void FreeOncomingCar(Script sender, Game3DObject gameObject)
+        {
+            var newXPosition = _random.Next(94, 98);
+            gameObject.MoveTo(new Vector3(newXPosition, gameObject.Position.Y, -4));
+            gameObject.Speed = 0;
+            gameObject.GetComponent<ObstacleInfoComponent>().IsFree = true;
+        }
+
+        private void FreeFollowingCar(Script sender, Game3DObject gameObject)
+        {
+            var newXPosition = _random.Next(104, 108);
+            gameObject.MoveTo(new Vector3(newXPosition, gameObject.Position.Y, -4));
+            gameObject.Speed = 0;
+            gameObject.GetComponent<ObstacleInfoComponent>().IsFree = true;
         }
 
         private void RemoveGrass(Script sender, Game3DObject gameObject)
@@ -284,7 +360,13 @@ namespace DisposeGame.Scenes
         {
             var body = LoadPersonWithTexture(loader, @"Textures\gachi.png");
 
-            body.AddChild(_camera);
+            var helpCube = loader.LoadGameObjectFromFile(@"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\helpcube2.fbx", Vector3.Zero, Vector3.Zero);
+            //helpCube.MoveTo(new Vector3(100, 1, -100));
+            helpCube.AddScript(new HelpCubeMovementScript());
+            helpCube.AddChild(_camera);
+            body.AddChild(helpCube);
+            helpCube.MoveTo(new Vector3(0, 0.5f, 0));
+            AddGameObject(helpCube);
 
             var gun = loader.MakeRectangle(Vector3.UnitY * -6, Vector3.Zero, Vector3.One * 1.2f);
             var bullet = loader.MakeRectangle(Vector3.Zero, Vector3.Zero, Vector3.One * 0.2f);
@@ -329,6 +411,7 @@ namespace DisposeGame.Scenes
             health.OnDeath += () =>
             {
                 _heroDeathSound.Play();
+                this.RemoveGameObject(helpCube);
                 Game.ChangeScene(new DeathMenuScene());
             };
             health.OnDamaged += (current, damage) =>
@@ -352,7 +435,7 @@ namespace DisposeGame.Scenes
 
             gun.AddScript(new PlayerGunScript(bullet, ammo, _rooms.Children));
 
-            body.Collision = new BoxCollision(5, 20);
+            body.Collision = new BoxCollision(1.7f, 20);
 
             return body;
         }
@@ -406,6 +489,34 @@ namespace DisposeGame.Scenes
             TotalEnemies++;
 
             return body;
+        }
+
+        private void CheckIIfPlayerOutsideOfRoad()
+        {
+            if (_player.Position.X <= _leftRoadBorder || _player.Position.X >= _rightRoadBorder)
+            {
+                _player.GetComponent<HealthComponent>().DealDamage(10);
+            }
+        }
+
+        private void SpawnObstacle()
+        {
+            if (_timer.Elapsed.TotalSeconds >= _spawnObstacleTime && _obstacles.Any(obstacle => obstacle.GetComponent<ObstacleInfoComponent>().IsFree))
+            {
+                _timer.Restart();
+                var length = _obstacles.Count;
+                while (true)
+                {
+                    var index = _random.Next(0, length);
+                    var obsatcleInfo = _obstacles[index].GetComponent<ObstacleInfoComponent>();
+                    if (obsatcleInfo.IsFree)
+                    {
+                        _obstacles[index].Speed = obsatcleInfo.OriginSpeed;
+                        obsatcleInfo.IsFree = false;
+                        break;
+                    }
+                }
+            }
         }
 
         protected override UIElement InitializeUI(Loader loader, DrawingContext context, int screenWidth, int screenHeight)
