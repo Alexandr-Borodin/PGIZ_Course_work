@@ -39,8 +39,11 @@ namespace DisposeGame.Scenes
         private const float _rightRoadBorder = 110f;
 
         private List<Game3DObject> _obstacles;
-        private Stopwatch _timer;
+        private List<Game3DObject> _bonuses;
+        private Stopwatch _obstacleTimer = new Stopwatch();
+        private Stopwatch _bonusTimer = new Stopwatch();
         private const int _spawnObstacleTime = 2;
+        private const int _spawnBonusTime = 4;
 
         private UIProgressBar _healthBar;
         private UIText _ammoCounter;
@@ -62,7 +65,8 @@ namespace DisposeGame.Scenes
         {
             base.Update(delta);
             CheckIIfPlayerOutsideOfRoad();
-            SpawnObstacle();
+            SpawnObstacle(_obstacles, _obstacleTimer, _spawnObstacleTime);
+            SpawnObstacle(_bonuses, _bonusTimer, _spawnBonusTime);
         }
 
         protected override void InitializeObjects(Loader loader, SharpAudioDevice audioDevice)
@@ -106,12 +110,11 @@ namespace DisposeGame.Scenes
             //AddGameObject(CreateZombie(loader, new Vector3(300, 0, 150)));
             //AddGameObject(CreateZombie(loader, new Vector3(300, 0, 35)));
 
-            AddGameObject(CreateAmmoBonus(loader, new Vector3(15, 0, 105)));
-            AddGameObject(CreateHealthBonus(loader, new Vector3(15, 0, 80)));
-            AddGameObject(CreateInvisibilityBonus(loader, new Vector3(120, 0, 80)));
+            //AddGameObject(CreateAmmoBonus(loader, new Vector3(15, 0, 105)));
+            //AddGameObject(CreateInvisibilityBonus(loader, new Vector3(120, 0, 80)));
 
-            AddGameObject(CreateAmmoBonus(loader, new Vector3(200, 0, 40)));
-            AddGameObject(CreateAmmoBonus(loader, new Vector3(220, 0, 40)));
+            //AddGameObject(CreateAmmoBonus(loader, new Vector3(200, 0, 40)));
+            //AddGameObject(CreateAmmoBonus(loader, new Vector3(220, 0, 40)));
             //AddGameObject(CreateHealthBonus(loader, new Vector3(16.660, 0, 40)));
 
             _roads = new List<Game3DObject>();
@@ -156,14 +159,22 @@ namespace DisposeGame.Scenes
             AddGameObject(car1);
             AddGameObject(car2);
 
+            _bonuses = new List<Game3DObject>();
+            var bonus1 = CreateHealthBonus(loader, new Vector3(100, 1, -80));
+            var bonus2 = CreateHealthBonus(loader, new Vector3(90, 1, -80));
+            _bonuses.Add(bonus1);
+            _bonuses.Add(bonus2);
+            AddGameObject(bonus1);
+            AddGameObject(bonus2);
 
-            _timer = new Stopwatch();
-            _timer.Start();
+
+            _obstacleTimer.Start();
+            _bonusTimer.Start();
         }
 
         private Game3DObject CreateHealthBonus(Loader loader, Vector3 position)
         {
-            var health = CreateBonus(loader, @"Models\BonusHeart.fbx", new HealthBonusScript(_player));
+            var health = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\newheart9.fbx", new HealthBonusScript(_player));
             health.MoveTo(position);
             return health;
         }
@@ -252,6 +263,13 @@ namespace DisposeGame.Scenes
             gameObject.Speed = 0;
             gameObject.GetComponent<ObstacleInfoComponent>().IsFree = true;
         }
+        private void FreeBonus(Script sender, Game3DObject gameObject)
+        {
+            var newXPosition = _random.Next(94, 108);
+            gameObject.MoveTo(new Vector3(newXPosition, gameObject.Position.Y, -4));
+            gameObject.Speed = 0;
+            gameObject.GetComponent<ObstacleInfoComponent>().IsFree = true;
+        }
 
         private void RemoveGrass(Script sender, Game3DObject gameObject)
         {
@@ -292,14 +310,19 @@ namespace DisposeGame.Scenes
             animation.AddProcess(value => 
             {
                 bonus.SetRotationZ(value);
-                bonus.SetPositionY(value - MathUtil.Pi);
+                //bonus.SetPositionY(value - MathUtil.Pi);
             });
-            script.OnPicked += _ =>
+            script.OnPicked += (sender, gameObject) =>
             {
                 _bonusPickedSound.Play();
-                animation.Cancel();
             };
+            script.OnPicked += FreeBonus;
             bonus.AddScript(script);
+            var environmentScript = new EnvironmentScript(Vector3.UnitZ, -0.4f, _roadDestroyBorder);
+            environmentScript.Destroy += FreeBonus;
+            bonus.AddScript(environmentScript);
+            bonus.Speed = -0.4f;
+            bonus.AddComponent(new ObstacleInfoComponent { IsFree = true, OriginSpeed = -0.4f });
             return bonus;
         }
 
@@ -499,19 +522,19 @@ namespace DisposeGame.Scenes
             }
         }
 
-        private void SpawnObstacle()
+        private void SpawnObstacle(List<Game3DObject> obstacles, Stopwatch timer, float spawnObstacleTime)
         {
-            if (_timer.Elapsed.TotalSeconds >= _spawnObstacleTime && _obstacles.Any(obstacle => obstacle.GetComponent<ObstacleInfoComponent>().IsFree))
+            if (timer.Elapsed.TotalSeconds >= spawnObstacleTime && obstacles.Any(obstacle => obstacle.GetComponent<ObstacleInfoComponent>().IsFree))
             {
-                _timer.Restart();
-                var length = _obstacles.Count;
+                timer.Restart();
+                var length = obstacles.Count;
                 while (true)
                 {
                     var index = _random.Next(0, length);
-                    var obsatcleInfo = _obstacles[index].GetComponent<ObstacleInfoComponent>();
+                    var obsatcleInfo = obstacles[index].GetComponent<ObstacleInfoComponent>();
                     if (obsatcleInfo.IsFree)
                     {
-                        _obstacles[index].Speed = obsatcleInfo.OriginSpeed;
+                        obstacles[index].Speed = obsatcleInfo.OriginSpeed;
                         obsatcleInfo.IsFree = false;
                         break;
                     }

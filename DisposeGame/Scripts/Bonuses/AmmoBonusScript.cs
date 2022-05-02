@@ -7,7 +7,7 @@ namespace DisposeGame.Scripts.Bonuses
     {
         public AmmoBonusScript(Game3DObject picker, int ammo = 20) : base(picker)
         {
-            OnPicked += _ => picker.GetComponent<AmmoComponent>().AddAmmo(ammo);
+            //OnPicked += _ => picker.GetComponent<AmmoComponent>().AddAmmo(ammo);
         }
     }
 }

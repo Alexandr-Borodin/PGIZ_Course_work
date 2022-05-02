@@ -1,4 +1,5 @@
-﻿using GameEngine.Collisions;
+﻿using DisposeGame.Scripts.Environment;
+using GameEngine.Collisions;
 using GameEngine.Graphics;
 using GameEngine.Scripts;
 using System;
@@ -9,7 +10,7 @@ namespace DisposeGame.Scripts.Bonuses
     {
         private Game3DObject _picker;
 
-        public event Action<Game3DObject> OnPicked;
+        public event ScriptHandler OnPicked;
 
         public PickableBonusScript(Game3DObject picker)
         {
@@ -20,8 +21,7 @@ namespace DisposeGame.Scripts.Bonuses
         {
             if (ObjectCollision.Intersects(_picker.Collision, GameObject.Collision))
             {
-                OnPicked?.Invoke(_picker);
-                GameObject.Scene.RemoveGameObject(GameObject);
+                OnPicked?.Invoke(this, GameObject);
             }
         }
     }
