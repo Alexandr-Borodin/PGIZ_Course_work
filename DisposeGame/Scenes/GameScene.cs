@@ -4,6 +4,7 @@ using AmazingUILibrary.Containers;
 using AmazingUILibrary.Drawing;
 using AmazingUILibrary.Elements;
 using DisposeGame.Components;
+using DisposeGame.Scenes.Models;
 using DisposeGame.Scripts;
 using DisposeGame.Scripts.Bonuses;
 using DisposeGame.Scripts.Character;
@@ -40,6 +41,7 @@ namespace DisposeGame.Scenes
 
         private List<Game3DObject> _obstacles;
         private List<Game3DObject> _bonuses;
+        private List<SpeedBonus> _activeSpeedBonuses = new List<SpeedBonus>();
         private Stopwatch _obstacleTimer = new Stopwatch();
         private Stopwatch _bonusTimer = new Stopwatch();
         private const int _spawnObstacleTime = 2;
@@ -160,12 +162,18 @@ namespace DisposeGame.Scenes
             AddGameObject(car2);
 
             _bonuses = new List<Game3DObject>();
-            var bonus1 = CreateHealthBonus(loader, new Vector3(100, 1, -80));
-            var bonus2 = CreateHealthBonus(loader, new Vector3(90, 1, -80));
+            var bonus1 = CreateSpeedUpBonus(loader, new Vector3(100, 1, -80));
+            var bonus2 = CreateSpeedUpBonus(loader, new Vector3(90, 1, -80));
+            var bonus3 = CreateSpeedDownBonus(loader, new Vector3(95, 1, -80));
+            var bonus4 = CreateSpeedDownBonus(loader, new Vector3(105, 1, -80));
             _bonuses.Add(bonus1);
             _bonuses.Add(bonus2);
+            _bonuses.Add(bonus3);
+            _bonuses.Add(bonus4);
             AddGameObject(bonus1);
             AddGameObject(bonus2);
+            AddGameObject(bonus3);
+            AddGameObject(bonus4);
 
 
             _obstacleTimer.Start();
@@ -177,6 +185,72 @@ namespace DisposeGame.Scenes
             var health = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\newheart9.fbx", new HealthBonusScript(_player));
             health.MoveTo(position);
             return health;
+        }
+
+        private Game3DObject CreateSpeedUpBonus(Loader loader, Vector3 position)
+        {
+            var temporaryBonus = new TemporaryBonus(_player);
+            temporaryBonus.OnPicked += (sender, gameObject) =>
+            {
+                if (_activeSpeedBonuses.Any(bonus => !bonus.IsSpeedUp))
+                {
+                    var activeSpeedDownBonus = _activeSpeedBonuses.Where(bonus => !bonus.IsSpeedUp).First();
+                    activeSpeedDownBonus.TemporaryBonus.EndBonus();
+                    _activeSpeedBonuses.Remove(activeSpeedDownBonus);
+                    return;
+                }
+
+                var temporaryBonusScript = sender as TemporaryBonus;
+                GameObjects.ForEach(road => road.Speed *= 2);
+                _activeSpeedBonuses.Add(new SpeedBonus { TemporaryBonus = temporaryBonusScript, IsSpeedUp = true });
+            };
+            temporaryBonus.BonusEnd += (sender, gameObject) =>
+            {
+                if (!_activeSpeedBonuses.Any(bonus => bonus.IsSpeedUp))
+                {
+                    return;
+                }
+
+                GameObjects.ForEach(road => road.Speed /= 2);
+                var activeSpeedUpBonus = _activeSpeedBonuses.Where(bonus => bonus.IsSpeedUp).FirstOrDefault();
+                _activeSpeedBonuses?.Remove(activeSpeedUpBonus);
+            };
+            var speedUp = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\speedup.fbx", temporaryBonus);
+            speedUp.MoveTo(position);
+            return speedUp;
+        }
+
+        private Game3DObject CreateSpeedDownBonus(Loader loader, Vector3 position)
+        {
+            var temporaryBonus = new TemporaryBonus(_player);
+            temporaryBonus.OnPicked += (sender, gameObject) =>
+            {
+                if (_activeSpeedBonuses.Any(bonus => bonus.IsSpeedUp))
+                {
+                    var activeSpeedUpBonus = _activeSpeedBonuses.Where(bonus => bonus.IsSpeedUp).First();
+                    activeSpeedUpBonus.TemporaryBonus.EndBonus();
+                    _activeSpeedBonuses.Remove(activeSpeedUpBonus);
+                    return;
+                }
+
+                var temporaryBonusScript = sender as TemporaryBonus;
+                GameObjects.ForEach(road => road.Speed /= 2);
+                _activeSpeedBonuses.Add(new SpeedBonus { TemporaryBonus = temporaryBonusScript, IsSpeedUp = false });
+            };
+            temporaryBonus.BonusEnd += (sender, gameObject) =>
+            {
+                if (!_activeSpeedBonuses.Any(bonus => !bonus.IsSpeedUp))
+                {
+                    return;
+                }
+
+                GameObjects.ForEach(road => road.Speed *= 2);
+                var activeSpeedDownBonus = _activeSpeedBonuses.Where(bonus => !bonus.IsSpeedUp).FirstOrDefault();
+                _activeSpeedBonuses?.Remove(activeSpeedDownBonus);
+            };
+            var speedUp = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\speeddown.fbx", temporaryBonus);
+            speedUp.MoveTo(position);
+            return speedUp;
         }
 
         private Game3DObject CreateOncomingCar(Loader loader, string modelPath)
@@ -206,7 +280,7 @@ namespace DisposeGame.Scenes
             car.AddScript(obstacleScript);
             var position = new Vector3(106, 1, -90);
             car.MoveTo(position);
-            car.Speed = -0.4f;
+            car.Speed = -0.8f;
             car.Collision = new BoxCollision(1.7f, 1);
             car.AddComponent(new ObstacleInfoComponent { IsFree = true, OriginSpeed = -0.4f });
             return car;
@@ -218,7 +292,7 @@ namespace DisposeGame.Scenes
             environmentScript.Destroy += RemoveRoad;
             var road = CreateEnvironment(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\road9.fbx", environmentScript);
             road.MoveTo(position);
-            road.Speed = -0.5f;
+            road.Speed = -0.75f;
             return road;
         }
 
@@ -228,7 +302,7 @@ namespace DisposeGame.Scenes
             environmentScript.Destroy += RemoveGrass;
             var road = CreateEnvironment(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\grass4.fbx", environmentScript);
             road.MoveTo(position);
-            road.Speed = -0.5f;
+            road.Speed = -0.75f;
             return road;
         }
 
@@ -245,6 +319,12 @@ namespace DisposeGame.Scenes
                 }
             }
             var newCoordZ = groundNearestToSpawnPoint.Position.Z + _roadOffset;
+
+            if (gameObject.Speed < -0.5f)
+            {
+                newCoordZ += gameObject.Speed * 2;
+            }
+
             gameObject.MoveTo(new Vector3(gameObject.Position.X, gameObject.Position.Y, newCoordZ));
         }
 
