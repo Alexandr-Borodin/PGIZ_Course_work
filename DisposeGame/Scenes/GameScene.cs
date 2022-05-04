@@ -36,14 +36,19 @@ namespace DisposeGame.Scenes
         private const float _roadOffset = 34.4f;
         private const float _roadDestroyBorder = -144.8f;
 
-        private const float _leftRoadBorder = 90f;
-        private const float _rightRoadBorder = 110f;
+        private const float _leftRoadBorder = 91.5f;
+        private const float _rightRoadBorder = 108.5f;
+        private const float _leftBorder = 85f;
+        private const float _rightBorder = 115f;
+        private bool _isPlayerOutsideOfRoad = false;
 
         private List<Game3DObject> _obstacles;
         private List<Game3DObject> _bonuses;
         private List<SpeedBonus> _activeSpeedBonuses = new List<SpeedBonus>();
         private Stopwatch _obstacleTimer = new Stopwatch();
         private Stopwatch _bonusTimer = new Stopwatch();
+        private double _scores = 0;
+        private double _scoresIncrement = 0.1;
         private const int _spawnObstacleTime = 2;
         private const int _spawnBonusTime = 4;
 
@@ -58,6 +63,9 @@ namespace DisposeGame.Scenes
         private SharpAudioVoice _zombieDeathSound;
         private SharpAudioVoice _zombieHitedSound;
 
+        private SharpAudioVoice _music;
+        private SharpAudioVoice _carSound;
+
         private Loader _loader;
         private Random _random = new Random();
 
@@ -67,8 +75,10 @@ namespace DisposeGame.Scenes
         {
             base.Update(delta);
             CheckIIfPlayerOutsideOfRoad();
+            CheckIfPlayerOutsideOfBorder();
             SpawnObstacle(_obstacles, _obstacleTimer, _spawnObstacleTime);
             SpawnObstacle(_bonuses, _bonusTimer, _spawnBonusTime);
+            CalculateScores();
         }
 
         protected override void InitializeObjects(Loader loader, SharpAudioDevice audioDevice)
@@ -83,6 +93,11 @@ namespace DisposeGame.Scenes
             _shotSound = new SharpAudioVoice(audioDevice, @"Sounds\Shot.wav");
             _zombieDeathSound = new SharpAudioVoice(audioDevice, @"Sounds\ZombieDeath.wav");
             _zombieHitedSound = new SharpAudioVoice(audioDevice, @"Sounds\ZombieHited.wav");
+
+            _music = new SharpAudioVoice(audioDevice, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Sounds\game_music.wav");
+            _carSound = new SharpAudioVoice(audioDevice, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Sounds\car_sound.wav");
+            _music.Stopped += _ => _music.Play();
+            _carSound.Stopped += _ => _carSound.Play();
 
             _rooms = CreateLevel(loader);
 
@@ -154,18 +169,21 @@ namespace DisposeGame.Scenes
             _obstacles = new List<Game3DObject>();
             var car1 = CreateOncomingCar(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\policecar2.fbx");
             var car2 = CreateFollowingCar(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\policecar2.fbx");
+            var sign1 = CreateSign(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\sign7.fbx");
 
             _obstacles.Add(car1);
             _obstacles.Add(car2);
+            _obstacles.Add(sign1);
 
             AddGameObject(car1);
             AddGameObject(car2);
+            AddGameObject(sign1);
 
             _bonuses = new List<Game3DObject>();
-            var bonus1 = CreateSpeedUpBonus(loader, new Vector3(100, 1, -80));
-            var bonus2 = CreateSpeedUpBonus(loader, new Vector3(90, 1, -80));
-            var bonus3 = CreateSpeedDownBonus(loader, new Vector3(95, 1, -80));
-            var bonus4 = CreateSpeedDownBonus(loader, new Vector3(105, 1, -80));
+            var bonus1 = CreateSpeedUpBonus(loader, new Vector3(100, 1, 0));
+            var bonus2 = CreateHealthBonus(loader, new Vector3(90, 1, 0));
+            var bonus3 = CreateSpeedDownBonus(loader, new Vector3(95, 1, 0));
+            var bonus4 = CreateScoresBonus(loader, new Vector3(105, 1, 0));
             _bonuses.Add(bonus1);
             _bonuses.Add(bonus2);
             _bonuses.Add(bonus3);
@@ -178,6 +196,15 @@ namespace DisposeGame.Scenes
 
             _obstacleTimer.Start();
             _bonusTimer.Start();
+            _music.Play();
+            _carSound.Play();
+        }
+
+        private void CalculateScores()
+        {
+            _scores += _scoresIncrement; ;
+            var scores = ((int)_scores);
+            _ammoCounter.Text = scores.ToString();
         }
 
         private Game3DObject CreateHealthBonus(Loader loader, Vector3 position)
@@ -185,6 +212,15 @@ namespace DisposeGame.Scenes
             var health = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\newheart9.fbx", new HealthBonusScript(_player));
             health.MoveTo(position);
             return health;
+        }
+
+        private Game3DObject CreateScoresBonus(Loader loader, Vector3 position)
+        {
+            var script = new AmmoBonusScript(_player);
+            script.OnPicked += (sender, gameObject) => _scores += 100;
+            var coin = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\coin6.fbx", script);
+            coin.MoveTo(position);
+            return coin;
         }
 
         private Game3DObject CreateSpeedUpBonus(Loader loader, Vector3 position)
@@ -202,6 +238,7 @@ namespace DisposeGame.Scenes
 
                 var temporaryBonusScript = sender as TemporaryBonus;
                 GameObjects.ForEach(road => road.Speed *= 2);
+                _scoresIncrement *= 2;
                 _activeSpeedBonuses.Add(new SpeedBonus { TemporaryBonus = temporaryBonusScript, IsSpeedUp = true });
             };
             temporaryBonus.BonusEnd += (sender, gameObject) =>
@@ -212,6 +249,7 @@ namespace DisposeGame.Scenes
                 }
 
                 GameObjects.ForEach(road => road.Speed /= 2);
+                _scoresIncrement /= 2;
                 var activeSpeedUpBonus = _activeSpeedBonuses.Where(bonus => bonus.IsSpeedUp).FirstOrDefault();
                 _activeSpeedBonuses?.Remove(activeSpeedUpBonus);
             };
@@ -235,6 +273,7 @@ namespace DisposeGame.Scenes
 
                 var temporaryBonusScript = sender as TemporaryBonus;
                 GameObjects.ForEach(road => road.Speed /= 2);
+                _scoresIncrement /= 2;
                 _activeSpeedBonuses.Add(new SpeedBonus { TemporaryBonus = temporaryBonusScript, IsSpeedUp = false });
             };
             temporaryBonus.BonusEnd += (sender, gameObject) =>
@@ -245,6 +284,7 @@ namespace DisposeGame.Scenes
                 }
 
                 GameObjects.ForEach(road => road.Speed *= 2);
+                _scoresIncrement *= 2;
                 var activeSpeedDownBonus = _activeSpeedBonuses.Where(bonus => !bonus.IsSpeedUp).FirstOrDefault();
                 _activeSpeedBonuses?.Remove(activeSpeedDownBonus);
             };
@@ -264,9 +304,11 @@ namespace DisposeGame.Scenes
             var position = new Vector3(96, 1, -90);
             car.MoveTo(position);
             car.RotateZ(MathUtil.DegreesToRadians(180));
+            //car.RotateY(MathUtil.DegreesToRadians(180));
             car.Speed = -1f;
             car.Collision = new BoxCollision(1.7f, 1);
             car.AddComponent(new ObstacleInfoComponent { IsFree = true, OriginSpeed = -1f });
+            //car.RotateY(MathUtil.DegreesToRadians(180));
             return car;
         }
 
@@ -284,6 +326,36 @@ namespace DisposeGame.Scenes
             car.Collision = new BoxCollision(1.7f, 1);
             car.AddComponent(new ObstacleInfoComponent { IsFree = true, OriginSpeed = -0.4f });
             return car;
+        }
+
+        private Game3DObject CreateSign(Loader loader, string modelPath)
+        {
+            var environmentScript = new EnvironmentScript(Vector3.UnitZ, -0.75f, _roadDestroyBorder);
+            environmentScript.Destroy += FreeSign;
+            var sign = CreateEnvironment(loader, modelPath, environmentScript);
+            var obstacleScript = new ObstacleScript(_player, 30);
+            obstacleScript.OnPicked += FreeSign;
+            sign.AddScript(obstacleScript);
+            var leftOrRight = _random.Next(0, 10);
+            Vector3 position;
+
+            if (leftOrRight >= 5)
+            {
+                position = new Vector3(_rightRoadBorder, 1, -90);
+                sign.SetRotationZ(MathUtil.DegreesToRadians(0));
+            }
+            else
+            {
+                position = new Vector3(_leftRoadBorder, 1, -90);
+                sign.SetRotationZ(MathUtil.DegreesToRadians(180));
+            }
+
+            sign.MoveTo(position);
+            sign.Speed = -0.75f;
+            sign.Collision = new BoxCollision(1.7f, 1);
+            sign.AddComponent(new ObstacleInfoComponent { IsFree = true, OriginSpeed = -0.75f });
+            
+            return sign;
         }
 
         private Game3DObject CreateRoad(Loader loader, Vector3 position)
@@ -343,6 +415,29 @@ namespace DisposeGame.Scenes
             gameObject.Speed = 0;
             gameObject.GetComponent<ObstacleInfoComponent>().IsFree = true;
         }
+
+        private void FreeSign(Script sender, Game3DObject gameObject)
+        {
+            var leftOrRight = _random.Next(0, 10);
+
+            if (leftOrRight >= 5)
+            {
+                var newXPosition = _rightRoadBorder;
+                gameObject.MoveTo(new Vector3(newXPosition, gameObject.Position.Y, -4));
+                gameObject.Speed = 0;
+                gameObject.GetComponent<ObstacleInfoComponent>().IsFree = true;
+                gameObject.SetRotationZ(MathUtil.DegreesToRadians(0));
+            }
+            else
+            {
+                var newXPosition = _leftRoadBorder;
+                gameObject.MoveTo(new Vector3(newXPosition, gameObject.Position.Y, -4));
+                gameObject.Speed = 0;
+                gameObject.GetComponent<ObstacleInfoComponent>().IsFree = true;
+                gameObject.SetRotationZ(MathUtil.DegreesToRadians(180));
+            }
+        }
+
         private void FreeBonus(Script sender, Game3DObject gameObject)
         {
             var newXPosition = _random.Next(94, 108);
@@ -401,7 +496,7 @@ namespace DisposeGame.Scenes
             var environmentScript = new EnvironmentScript(Vector3.UnitZ, -0.4f, _roadDestroyBorder);
             environmentScript.Destroy += FreeBonus;
             bonus.AddScript(environmentScript);
-            bonus.Speed = -0.4f;
+            bonus.Speed = 0f;
             bonus.AddComponent(new ObstacleInfoComponent { IsFree = true, OriginSpeed = -0.4f });
             return bonus;
         }
@@ -499,7 +594,7 @@ namespace DisposeGame.Scenes
             //body.AddComponent(physics);
             //body.AddScript(new PhysicsScript(physics));
 
-            var movementScript = new PlayerMovementScript(characterMovementAnimation, null, _rooms.Children);
+            var movementScript = new PlayerMovementScript(characterMovementAnimation, null, _rooms.Children, 16f);
             movementScript.OnJump += () => _heroJump.Play();
             body.AddScript(movementScript);
 
@@ -513,6 +608,8 @@ namespace DisposeGame.Scenes
             health.OnChanged += value => _healthBar.Value = value;
             health.OnDeath += () =>
             {
+                _music.Stop();
+                _carSound.Stop();
                 _heroDeathSound.Play();
                 this.RemoveGameObject(helpCube);
                 Game.ChangeScene(new DeathMenuScene());
@@ -599,6 +696,34 @@ namespace DisposeGame.Scenes
             if (_player.Position.X <= _leftRoadBorder || _player.Position.X >= _rightRoadBorder)
             {
                 _player.GetComponent<HealthComponent>().DealDamage(10);
+                
+                if (!_isPlayerOutsideOfRoad)
+                {
+                    GameObjects.ForEach(gameObject => gameObject.Speed /= 2);
+                    _isPlayerOutsideOfRoad = true;
+                }
+            }
+
+            if (_player.Position.X >= _leftRoadBorder && _player.Position.X <= _rightRoadBorder)
+            {
+                if (_isPlayerOutsideOfRoad)
+                {
+                    GameObjects.ForEach(gameObject => gameObject.Speed *= 2);
+                    _isPlayerOutsideOfRoad = false;
+                }
+            }
+        }
+
+        private void CheckIfPlayerOutsideOfBorder()
+        {
+            if (_player.Position.X < _leftBorder)
+            {
+                _player.MoveTo(new Vector3(_leftBorder, _player.Position.Y, _player.Position.Z));
+            }
+
+            if (_player.Position.X > _rightBorder)
+            {
+                _player.MoveTo(new Vector3(_rightBorder, _player.Position.Y, _player.Position.Z));
             }
         }
 

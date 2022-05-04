@@ -7,7 +7,7 @@ namespace GameEngine.Scripts
 {
     public class KeyboardListenerScript : Script
     {
-        private InputController _inputController;
+        protected InputController _inputController;
         private Dictionary<Key, Action<float>> _actions;
         
         public Dictionary<Key, Action<float>> Actions { get => _actions; }
