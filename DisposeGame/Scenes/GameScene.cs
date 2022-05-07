@@ -62,6 +62,7 @@ namespace DisposeGame.Scenes
         private SharpAudioVoice _shotSound;
         private SharpAudioVoice _zombieDeathSound;
         private SharpAudioVoice _zombieHitedSound;
+        private SharpAudioVoice _coinSound;
 
         private SharpAudioVoice _music;
         private SharpAudioVoice _carSound;
@@ -86,13 +87,14 @@ namespace DisposeGame.Scenes
             _loader = loader;
             _camera = new Camera(new Vector3(0, 22, -100), rotY: 0.20f, fovY: 0.1f);
 
-            _bonusPickedSound = new SharpAudioVoice(audioDevice, @"Sounds\BonusPicked.wav");
-            _heroDeathSound = new SharpAudioVoice(audioDevice, @"Sounds\HeroDeath.wav");
-            _heroHitedSound = new SharpAudioVoice(audioDevice, @"Sounds\HeroHited.wav");
+            _bonusPickedSound = new SharpAudioVoice(audioDevice, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Sounds\bonus.wav");
+            _heroDeathSound = new SharpAudioVoice(audioDevice, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Sounds\explosion.wav");
+            _heroHitedSound = new SharpAudioVoice(audioDevice, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Sounds\crash.wav");
             _heroJump = new SharpAudioVoice(audioDevice, @"Sounds\HeroJump.wav");
             _shotSound = new SharpAudioVoice(audioDevice, @"Sounds\Shot.wav");
             _zombieDeathSound = new SharpAudioVoice(audioDevice, @"Sounds\ZombieDeath.wav");
             _zombieHitedSound = new SharpAudioVoice(audioDevice, @"Sounds\ZombieHited.wav");
+            _coinSound = new SharpAudioVoice(audioDevice, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Sounds\coin.wav");
 
             _music = new SharpAudioVoice(audioDevice, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Sounds\game_music.wav");
             _carSound = new SharpAudioVoice(audioDevice, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Sounds\car_sound.wav");
@@ -136,20 +138,28 @@ namespace DisposeGame.Scenes
 
             _roads = new List<Game3DObject>();
             var roadOne = CreateRoad(loader, new Vector3(100, 0, -110));
-            var grassOneLeft = CreateGrass(loader, new Vector3(roadOne.Position.X - 16.66f, roadOne.Position.Y, roadOne.Position.Z));
-            var grassOneRight = CreateGrass(loader, new Vector3(roadOne.Position.X + 16.66f, roadOne.Position.Y, roadOne.Position.Z));
+            var grassOneLeft1 = CreateGrass(loader, new Vector3(roadOne.Position.X - 33.34f, roadOne.Position.Y, roadOne.Position.Z));
+            var grassOneRight1 = CreateGrass(loader, new Vector3(roadOne.Position.X + 33.27f, roadOne.Position.Y, roadOne.Position.Z));
+            var grassOneLeft2 = CreateGrass(loader, new Vector3(roadOne.Position.X - 63.27f, roadOne.Position.Y, roadOne.Position.Z));
+            var grassOneRight2 = CreateGrass(loader, new Vector3(roadOne.Position.X + 63.27f, roadOne.Position.Y, roadOne.Position.Z));
             _roads.Add(roadOne);
             var roadTwo = CreateRoad(loader, new Vector3(100, 0, -75.2f));
-            var grassTwoLeft = CreateGrass(loader, new Vector3(roadTwo.Position.X - 16.66f, roadTwo.Position.Y, roadTwo.Position.Z));
-            var grassTwoRight = CreateGrass(loader, new Vector3(roadTwo.Position.X + 16.66f, roadTwo.Position.Y, roadTwo.Position.Z));
+            var grassTwoLeft1 = CreateGrass(loader, new Vector3(roadTwo.Position.X - 33.34f, roadTwo.Position.Y, roadTwo.Position.Z));
+            var grassTwoRight1 = CreateGrass(loader, new Vector3(roadTwo.Position.X + 33.27f, roadTwo.Position.Y, roadTwo.Position.Z));
+            var grassTwoLeft2 = CreateGrass(loader, new Vector3(roadTwo.Position.X - 63.27f, roadTwo.Position.Y, roadTwo.Position.Z));
+            var grassTwoRight2 = CreateGrass(loader, new Vector3(roadTwo.Position.X + 63.27f, roadTwo.Position.Y, roadTwo.Position.Z));
             _roads.Add(roadTwo);
             var roadThree = CreateRoad(loader, new Vector3(100, 0, -40.4f));
-            var grassThreeLeft = CreateGrass(loader, new Vector3(roadThree.Position.X - 16.66f, roadThree.Position.Y, roadThree.Position.Z));
-            var grassThreeRight = CreateGrass(loader, new Vector3(roadThree.Position.X + 16.66f, roadThree.Position.Y, roadThree.Position.Z));
+            var grassThreeLeft1 = CreateGrass(loader, new Vector3(roadThree.Position.X - 33.34f, roadThree.Position.Y, roadThree.Position.Z));
+            var grassThreeRight1 = CreateGrass(loader, new Vector3(roadThree.Position.X + 33.27f, roadThree.Position.Y, roadThree.Position.Z));
+            var grassThreeLeft2 = CreateGrass(loader, new Vector3(roadThree.Position.X - 63.27f, roadThree.Position.Y, roadThree.Position.Z));
+            var grassThreeRight2 = CreateGrass(loader, new Vector3(roadThree.Position.X + 63.27f, roadThree.Position.Y, roadThree.Position.Z));
             _roads.Add(roadThree);
             var roadFour = CreateRoad(loader, new Vector3(100, 0, -5.6f));
-            var grassFourLeft = CreateGrass(loader, new Vector3(roadFour.Position.X - 16.66f, roadFour.Position.Y, roadFour.Position.Z));
-            var grassFourRight = CreateGrass(loader, new Vector3(roadFour.Position.X + 16.66f, roadFour.Position.Y, roadFour.Position.Z));
+            var grassFourLeft1 = CreateGrass(loader, new Vector3(roadFour.Position.X - 33.34f, roadFour.Position.Y, roadFour.Position.Z));
+            var grassFourRight1 = CreateGrass(loader, new Vector3(roadFour.Position.X + 33.27f, roadFour.Position.Y, roadFour.Position.Z));
+            var grassFourLeft2 = CreateGrass(loader, new Vector3(roadFour.Position.X - 63.27f, roadFour.Position.Y, roadFour.Position.Z));
+            var grassFourRight2 = CreateGrass(loader, new Vector3(roadFour.Position.X + 63.27f, roadFour.Position.Y, roadFour.Position.Z));
             _roads.Add(roadFour);
 
             foreach (var road in _roads)
@@ -157,26 +167,46 @@ namespace DisposeGame.Scenes
                 AddGameObject(road);
             }
 
-            AddGameObject(grassOneLeft);
-            AddGameObject(grassOneRight);
-            AddGameObject(grassTwoLeft);
-            AddGameObject(grassTwoRight);
-            AddGameObject(grassThreeLeft);
-            AddGameObject(grassThreeRight);
-            AddGameObject(grassFourLeft);
-            AddGameObject(grassFourRight);
+            AddGameObject(grassOneLeft1);
+            AddGameObject(grassOneRight1);
+            AddGameObject(grassOneLeft2);
+            AddGameObject(grassOneRight2);
+            AddGameObject(grassTwoLeft1);
+            AddGameObject(grassTwoRight1);
+            AddGameObject(grassTwoLeft2);
+            AddGameObject(grassTwoRight2);
+            AddGameObject(grassThreeLeft1);
+            AddGameObject(grassThreeRight1);
+            AddGameObject(grassThreeLeft2);
+            AddGameObject(grassThreeRight2);
+            AddGameObject(grassFourLeft1);
+            AddGameObject(grassFourRight1);
+            AddGameObject(grassFourLeft2);
+            AddGameObject(grassFourRight2);
 
             _obstacles = new List<Game3DObject>();
-            var car1 = CreateOncomingCar(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\policecar2.fbx");
-            var car2 = CreateFollowingCar(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\policecar2.fbx");
+            var car1 = CreateOncomingCar(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\policecar2.fbx", 1.7f, 1);
+            var car2 = CreateOncomingCar(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\deliverycar3.fbx", 3f, 1);
+            var car3 = CreateOncomingCar(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\ordinarycar.fbx", 1.6f, 1);
+            var car4 = CreateFollowingCar(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\policecar2.fbx", 1.7f, 1);
+            var car5 = CreateFollowingCar(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\deliverycar3.fbx", 3f, 1);
+            var car6 = CreateFollowingCar(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\ordinarycar.fbx", 1.6f, 1);
             var sign1 = CreateSign(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\sign7.fbx");
 
             _obstacles.Add(car1);
             _obstacles.Add(car2);
+            _obstacles.Add(car3);
+            _obstacles.Add(car4);
+            _obstacles.Add(car5);
+            _obstacles.Add(car6);
             _obstacles.Add(sign1);
 
             AddGameObject(car1);
             AddGameObject(car2);
+            AddGameObject(car3);
+            AddGameObject(car4);
+            AddGameObject(car5);
+            AddGameObject(car6);
             AddGameObject(sign1);
 
             _bonuses = new List<Game3DObject>();
@@ -209,7 +239,7 @@ namespace DisposeGame.Scenes
 
         private Game3DObject CreateHealthBonus(Loader loader, Vector3 position)
         {
-            var health = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\newheart9.fbx", new HealthBonusScript(_player));
+            var health = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\newheart9.fbx", new HealthBonusScript(_player), _bonusPickedSound);
             health.MoveTo(position);
             return health;
         }
@@ -218,7 +248,7 @@ namespace DisposeGame.Scenes
         {
             var script = new AmmoBonusScript(_player);
             script.OnPicked += (sender, gameObject) => _scores += 100;
-            var coin = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\coin6.fbx", script);
+            var coin = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\coin6.fbx", script, _coinSound);
             coin.MoveTo(position);
             return coin;
         }
@@ -253,7 +283,7 @@ namespace DisposeGame.Scenes
                 var activeSpeedUpBonus = _activeSpeedBonuses.Where(bonus => bonus.IsSpeedUp).FirstOrDefault();
                 _activeSpeedBonuses?.Remove(activeSpeedUpBonus);
             };
-            var speedUp = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\speedup.fbx", temporaryBonus);
+            var speedUp = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\speedup.fbx", temporaryBonus, _bonusPickedSound);
             speedUp.MoveTo(position);
             return speedUp;
         }
@@ -288,12 +318,12 @@ namespace DisposeGame.Scenes
                 var activeSpeedDownBonus = _activeSpeedBonuses.Where(bonus => !bonus.IsSpeedUp).FirstOrDefault();
                 _activeSpeedBonuses?.Remove(activeSpeedDownBonus);
             };
-            var speedUp = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\speeddown.fbx", temporaryBonus);
+            var speedUp = CreateBonus(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\speeddown.fbx", temporaryBonus, _bonusPickedSound);
             speedUp.MoveTo(position);
             return speedUp;
         }
 
-        private Game3DObject CreateOncomingCar(Loader loader, string modelPath)
+        private Game3DObject CreateOncomingCar(Loader loader, string modelPath, float collisionWidth, float collisionHeight)
         {
             var environmentScript = new EnvironmentScript(Vector3.UnitZ, -1f, _roadDestroyBorder);
             environmentScript.Destroy += FreeOncomingCar;
@@ -306,13 +336,13 @@ namespace DisposeGame.Scenes
             car.RotateZ(MathUtil.DegreesToRadians(180));
             //car.RotateY(MathUtil.DegreesToRadians(180));
             car.Speed = -1f;
-            car.Collision = new BoxCollision(1.7f, 1);
+            car.Collision = new BoxCollision(collisionWidth, collisionHeight);
             car.AddComponent(new ObstacleInfoComponent { IsFree = true, OriginSpeed = -1f });
             //car.RotateY(MathUtil.DegreesToRadians(180));
             return car;
         }
 
-        private Game3DObject CreateFollowingCar(Loader loader, string modelPath)
+        private Game3DObject CreateFollowingCar(Loader loader, string modelPath, float collisionWidth, float collisionHeight)
         {
             var environmentScript = new EnvironmentScript(Vector3.UnitZ, -0.4f, _roadDestroyBorder);
             environmentScript.Destroy += FreeFollowingCar;
@@ -323,7 +353,7 @@ namespace DisposeGame.Scenes
             var position = new Vector3(106, 1, -90);
             car.MoveTo(position);
             car.Speed = -0.8f;
-            car.Collision = new BoxCollision(1.7f, 1);
+            car.Collision = new BoxCollision(collisionWidth, collisionHeight);
             car.AddComponent(new ObstacleInfoComponent { IsFree = true, OriginSpeed = -0.4f });
             return car;
         }
@@ -372,7 +402,7 @@ namespace DisposeGame.Scenes
         {
             var environmentScript = new EnvironmentScript(Vector3.UnitZ, -0.5f, _roadDestroyBorder);
             environmentScript.Destroy += RemoveGrass;
-            var road = CreateEnvironment(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\grass4.fbx", environmentScript);
+            var road = CreateEnvironment(loader, @"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Models\grass.fbx", environmentScript);
             road.MoveTo(position);
             road.Speed = -0.75f;
             return road;
@@ -464,19 +494,19 @@ namespace DisposeGame.Scenes
 
         private Game3DObject CreateAmmoBonus(Loader loader, Vector3 position)
         {
-            var ammo = CreateBonus(loader, @"Models\BonusAmmo.fbx", new AmmoBonusScript(_player));
+            var ammo = CreateBonus(loader, @"Models\BonusAmmo.fbx", new AmmoBonusScript(_player), _bonusPickedSound);
             ammo.MoveTo(position);
             return ammo;
         }
 
         private Game3DObject CreateInvisibilityBonus(Loader loader, Vector3 position)
         {
-            var invisibility = CreateBonus(loader, @"Models\BonusStels.fbx", new InvisibilityBonusScript(_player));
+            var invisibility = CreateBonus(loader, @"Models\BonusStels.fbx", new InvisibilityBonusScript(_player), _bonusPickedSound);
             invisibility.MoveTo(position);
             return invisibility;
         }
 
-        private Game3DObject CreateBonus(Loader loader, string path, PickableBonusScript script)
+        private Game3DObject CreateBonus(Loader loader, string path, PickableBonusScript script, SharpAudioVoice bonusPickedSound)
         {
             var bonus = loader.LoadGameObjectFromFile(path, Vector3.Zero, Vector3.Zero);
             bonus.Collision = new SphereCollision(2);
@@ -489,7 +519,7 @@ namespace DisposeGame.Scenes
             });
             script.OnPicked += (sender, gameObject) =>
             {
-                _bonusPickedSound.Play();
+                bonusPickedSound.Play();
             };
             script.OnPicked += FreeBonus;
             bonus.AddScript(script);
@@ -749,9 +779,10 @@ namespace DisposeGame.Scenes
 
         protected override UIElement InitializeUI(Loader loader, DrawingContext context, int screenWidth, int screenHeight)
         {
-            context.NewNinePartsBitmap("glowingBorder", loader.LoadBitmapFromFile(@"Textures\GlowingBorder.png"), 21, 29, 21, 29);
+            //context.NewNinePartsBitmap("glowingBorder", loader.LoadBitmapFromFile(@"Textures\GlowingBorder.png"), 21, 29, 21, 29);
             context.NewBitmap("bulletsTexture", loader.LoadBitmapFromFile(@"Textures\Bullets.png"));
-            context.NewSolidBrush("neonBrush", new RawColor4(144f / 255f, 238f / 255f, 233f / 255f, 1f));
+            context.NewSolidBrush("redBrush", new RawColor4(255f / 255f, 0f / 255f, 0f / 255f, 1f));
+            context.NewSolidBrush("whiteBrush", new RawColor4(255f / 255f, 255f / 255f, 255f / 255f, 1f));
             context.NewTextFormat("ammoFormat", 
                 fontWeight: SharpDX.DirectWrite.FontWeight.Black,
                 textAlignment: SharpDX.DirectWrite.TextAlignment.Center,
@@ -763,8 +794,8 @@ namespace DisposeGame.Scenes
                 CrossAxis = UISequentialContainer.Alignment.Start
             };
             
-            _healthBar = new UIProgressBar(Vector2.Zero, new Vector2(100, 20), "neonBrush");
-            _ammoCounter = new UIText("0", new Vector2(48, 10), "ammoFormat", "neonBrush");
+            _healthBar = new UIProgressBar(Vector2.Zero, new Vector2(100, 20), "redBrush");
+            _ammoCounter = new UIText("0", new Vector2(48, 10), "ammoFormat", "whiteBrush");
             var ammoImage = new UIPanel(Vector2.Zero, new Vector2(40, 36))
             {
                 Background = new TextureBackground("bulletsTexture")
@@ -775,12 +806,16 @@ namespace DisposeGame.Scenes
                 MainAxis = UISequentialContainer.Alignment.Start,
                 CrossAxis = UISequentialContainer.Alignment.Center
             };
-            var healthContainer = new UIMarginContainer(_healthBar, 15)
+
+            var healthContainer = new UISequentialContainer(Vector2.Zero, new Vector2(100, 36), false)
             {
-                Background = new NinePartsTextureBackground("glowingBorder")
+                MainAxis = UISequentialContainer.Alignment.Start,
+                CrossAxis = UISequentialContainer.Alignment.Center,
             };
 
-            ammoContainer.Add(new UIMarginContainer(ammoImage, 6, 0));
+            healthContainer.Add(new UIMarginContainer(ammoImage, 0, 0));
+            healthContainer.Add(new UIMarginContainer(_healthBar, 0, 0));
+
             ammoContainer.Add(_ammoCounter);
 
             ui.Add(ammoContainer);
@@ -807,6 +842,7 @@ namespace DisposeGame.Scenes
 
         public override void Dispose()
         {
+            _coinSound.Dispose();
             _bonusPickedSound.Dispose();
             _heroDeathSound.Dispose();
             _heroHitedSound.Dispose();

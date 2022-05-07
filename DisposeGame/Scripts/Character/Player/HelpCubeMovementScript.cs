@@ -13,6 +13,9 @@ namespace DisposeGame.Scripts.Character.Player
         private InputController _inputController;
         private float _mouseSensitivity;
 
+        private float _leftRotationBorder = -0.7f;
+        private float _rightRotationBorder = 0.7f;
+
         public HelpCubeMovementScript(float mouseSensitivity = 0.25f)
         {
             _mouseSensitivity = mouseSensitivity;
@@ -25,6 +28,16 @@ namespace DisposeGame.Scripts.Character.Player
             if (_inputController.MouseUpdate)
             {
                 GameObject.RotateZ(delta * _mouseSensitivity * _inputController.MouseRelativePositionX);
+            }
+
+            if (GameObject.Rotation.Z > _rightRotationBorder)
+            {
+                GameObject.SetRotationZ(_rightRotationBorder);
+            }
+
+            if (GameObject.Rotation.Z < _leftRotationBorder)
+            {
+                GameObject.SetRotationZ(_leftRotationBorder);
             }
         }
     }

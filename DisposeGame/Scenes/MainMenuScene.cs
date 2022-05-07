@@ -15,7 +15,7 @@ namespace DisposeGame.Scenes
         protected override UIElement InitializeUI(Loader loader, DrawingContext context, int screenWidth, int screenHeight)
         {
             context.NewNinePartsBitmap("glowingBorder", loader.LoadBitmapFromFile(@"Textures\GlowingBorder.png"), 21, 29, 21, 29);
-            context.NewBitmap("backgroundBitmap", loader.LoadBitmapFromFile(@"Textures\mainbg.jpg"));
+            context.NewBitmap("backgroundBitmap", loader.LoadBitmapFromFile(@"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Textures\mainbg.jpg"));
             context.NewSolidBrush("whiteBrush", new RawColor4(1f, 1f, 1f, 1f));
             context.NewTextFormat("textFormat", textAlignment: TextAlignment.Center, paragraphAlignment: ParagraphAlignment.Center);
 
@@ -25,16 +25,15 @@ namespace DisposeGame.Scenes
                 CrossAxis = UISequentialContainer.Alignment.Center,
                 Background = new TextureBackground("backgroundBitmap")
             };
-            var menu = new UISequentialContainer(Vector2.Zero, new Vector2(150, 170))
+            var menu = new UISequentialContainer(Vector2.Zero, new Vector2(250, 500))
             {
-                MainAxis = UISequentialContainer.Alignment.Center,
+                MainAxis = UISequentialContainer.Alignment.End,
                 CrossAxis = UISequentialContainer.Alignment.Center,
-                Background = new NinePartsTextureBackground("glowingBorder")
             };
             ui.Add(menu);
 
-            var startText = new UIText("Start", new Vector2(120, 52), "textFormat", "whiteBrush");
-            var quitText = new UIText("Quit", new Vector2(120, 52), "textFormat", "whiteBrush");
+            var startText = new UIText("Start", new Vector2(200, 52), "textFormat", "whiteBrush");
+            var quitText = new UIText("Quit", new Vector2(200, 52), "textFormat", "whiteBrush");
 
             var startButton = new UIButton(startText) 
             { 
