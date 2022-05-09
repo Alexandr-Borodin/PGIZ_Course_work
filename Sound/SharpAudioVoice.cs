@@ -106,7 +106,6 @@ namespace Sound
             _voice.Dispose();
             _stream.Dispose();
             _buffer.Stream.Dispose();
-
         }
     }
 }

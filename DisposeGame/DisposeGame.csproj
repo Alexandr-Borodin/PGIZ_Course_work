@@ -82,10 +82,12 @@
   <ItemGroup>
     <Compile Include="Components\AmmoComponent.cs" />
     <Compile Include="Components\HealthComponent.cs" />
+    <Compile Include="Components\ObstacleInfoComponent.cs" />
     <Compile Include="Components\PhysicsComponent.cs" />
     <Compile Include="Components\VisibilityComponent.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scenes\Models\SpeedBonus.cs" />
     <Compile Include="Scenes\WinMenuScene.cs" />
     <Compile Include="Scenes\GameScene.cs" />
     <Compile Include="Scenes\DeathMenuScene.cs" />
@@ -96,11 +98,13 @@
     <Compile Include="Scripts\Bonuses\HealthBonusScript.cs" />
     <Compile Include="Scripts\Bonuses\InvisibilityBonusScript.cs" />
     <Compile Include="Scripts\Bonuses\PickableBonusScript.cs" />
+    <Compile Include="Scripts\Bonuses\TemporaryBonus.cs" />
     <Compile Include="Scripts\BulletScript.cs" />
     <Compile Include="Scripts\CameraFovController.cs" />
     <Compile Include="Scripts\CameraMovementScript.cs" />
     <Compile Include="Scripts\BodyPartClickScript.cs" />
     <Compile Include="Scripts\Character\CharacterMovement.cs" />
+    <Compile Include="Scripts\Character\Player\HelpCubeMovementScript.cs" />
     <Compile Include="Scripts\Character\Player\PlayerGunScript.cs" />
     <Compile Include="Scripts\Character\Player\PlayerMovementScript.cs" />
     <Compile Include="Scripts\Character\Player\PlayerUnbreakableScript.cs" />
@@ -108,6 +112,8 @@
     <Compile Include="Scripts\Character\ZombieMovementScript.cs" />
     <Compile Include="Scripts\DinoClickScript.cs" />
     <Compile Include="Scripts\DinoMovementScript.cs" />
+    <Compile Include="Scripts\Environment\EnvironmentScript.cs" />
+    <Compile Include="Scripts\Environment\ObstacleScript.cs" />
     <Compile Include="Scripts\PhysicsScript.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -7,7 +7,7 @@ namespace DisposeGame.Scripts.Bonuses
     {
         public InvisibilityBonusScript(Game3DObject picker, float duration = 5) : base(picker)
         {
-            OnPicked += _ => picker.GetComponent<VisibilityComponent>().MakeInvisible(duration);
+            //OnPicked += _ => picker.GetComponent<VisibilityComponent>().MakeInvisible(duration);
         }
     }
 }

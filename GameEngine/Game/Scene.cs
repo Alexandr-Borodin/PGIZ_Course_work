@@ -101,7 +101,7 @@ namespace GameEngine.Game
             gameObject.Dispose();
         }
 
-        public void Update(float delta)
+        public virtual void Update(float delta)
         {
             AddGameObjects();
             foreach (Game3DObject gameObject in _gameObjects)

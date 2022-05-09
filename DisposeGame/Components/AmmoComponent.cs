@@ -11,7 +11,7 @@ namespace DisposeGame.Components
 
         public int Ammo { get; private set; }
 
-        public AmmoComponent(int ammo = 30)
+        public AmmoComponent(int ammo = 0)
         {
             Ammo = ammo;
         }

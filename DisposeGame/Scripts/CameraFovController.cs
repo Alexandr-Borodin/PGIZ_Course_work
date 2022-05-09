@@ -6,7 +6,7 @@ namespace DisposeGame.Scripts
 {
     public class CameraFovController : KeyboardListenerScript
     {
-        public CameraFovController(Camera camera)
+        public CameraFovController(GameEngine.Graphics.Camera camera)
         {
             Actions.Add(Key.Z, delta => camera.FOVY += 0.05f);
             Actions.Add(Key.X, delta => camera.FOVY -= 0.05f);

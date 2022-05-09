@@ -15,26 +15,25 @@ namespace DisposeGame.Scenes
         protected override UIElement InitializeUI(Loader loader, DrawingContext context, int screenWidth, int screenHeight)
         {
             context.NewNinePartsBitmap("redGlowingBorder", loader.LoadBitmapFromFile(@"Textures\RedGlowingBorder.png"), 21, 29, 21, 29);
-            context.NewBitmap("deathBackgroundBitmap", loader.LoadBitmapFromFile(@"Textures\deathbg.jpg"));
-            context.NewSolidBrush("whiteBrush", new RawColor4(1f, 1f, 1f, 1f));
+            context.NewBitmap("deathBackgroundBitmap", loader.LoadBitmapFromFile(@"C:\Учёба\3-ий курс\2-ой семестр\Course work\Repository\PGIZ_Course_work\DisposeGame\Textures\endbg.jpg"));
+            context.NewSolidBrush("blackBrush", new RawColor4(0f, 0f, 0f, 1f));
             context.NewTextFormat("textFormat", textAlignment: TextAlignment.Center, paragraphAlignment: ParagraphAlignment.Center);
 
             var ui = new UISequentialContainer(Vector2.Zero, new Vector2(screenWidth, screenHeight))
             {
-                MainAxis = UISequentialContainer.Alignment.Center,
+                MainAxis = UISequentialContainer.Alignment.Start,
                 CrossAxis = UISequentialContainer.Alignment.Center,
                 Background = new TextureBackground("deathBackgroundBitmap")
             };
-            var menu = new UISequentialContainer(Vector2.Zero, new Vector2(150, 180))
+            var menu = new UISequentialContainer(Vector2.Zero, new Vector2(screenWidth, screenHeight))
             {
                 MainAxis = UISequentialContainer.Alignment.Center,
-                CrossAxis = UISequentialContainer.Alignment.Center,
-                Background = new NinePartsTextureBackground("redGlowingBorder")
+                CrossAxis = UISequentialContainer.Alignment.Start,
             };
             ui.Add(menu);
 
-            var restartText = new UIText("Restart", new Vector2(120, 52), "textFormat", "whiteBrush");
-            var mainMenuText = new UIText("Main Menu", new Vector2(120, 52), "textFormat", "whiteBrush");
+            var restartText = new UIText("Restart", new Vector2(120, 52), "textFormat", "blackBrush");
+            var mainMenuText = new UIText("Main Menu", new Vector2(120, 52), "textFormat", "blackBrush");
 
             var restartButton = new UIButton(restartText) 
             { 
@@ -56,7 +55,7 @@ namespace DisposeGame.Scenes
                 Game.ChangeScene(new MainMenuScene());
             };
 
-            menu.Add(new UIText("You are dead", new Vector2(120, 52), "textFormat", "whiteBrush"));
+            //menu.Add(new UIText("You are dead", new Vector2(120, 52), "textFormat", "whiteBrush"));
             menu.Add(restartButton);
             menu.Add(mainMenuButton);
 

@@ -104,7 +104,7 @@ namespace GameEngine.Game
                     Texture2D = new ShaderResourceViewDescription.Texture2DResource
                     {
                         MostDetailedMip = 0,
-                        MipLevels = (generateMips ? mipLevels : 1)
+                        MipLevels = 1 //(generateMips ? mipLevels : 1)
                     }
                 };
             ShaderResourceView shaderResourceView =
@@ -147,7 +147,7 @@ namespace GameEngine.Game
 
                     if (child.HasMeshes)
                     {
-                        child.Transform.Decompose(out Vector3D _, out Assimp.Quaternion rotation, out Vector3D position);
+                        child.Transform.Decompose(out Vector3D scale, out Assimp.Quaternion rotation, out Vector3D position);
                         var childObject = gameObject.AddChild(new Game3DObject(new Vector3(position.X, position.Y, position.Z), ToEulerAngles(rotation)));
                         childObject.AddMeshObject(meshList[child.MeshIndices[0]]);
                         GetChildrenMeshes(ref childObject, child);

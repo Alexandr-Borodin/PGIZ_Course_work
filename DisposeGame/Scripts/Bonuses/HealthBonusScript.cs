@@ -7,7 +7,7 @@ namespace DisposeGame.Scripts.Bonuses
     {
         public HealthBonusScript(Game3DObject picker, int heal = 10) : base(picker)
         {
-            OnPicked += _ => picker.GetComponent<HealthComponent>().Heal(heal);
+            OnPicked += (sender, gameObject) => picker.GetComponent<HealthComponent>().Heal(heal);
         }
     }
 }

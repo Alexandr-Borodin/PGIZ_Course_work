@@ -25,6 +25,7 @@ namespace GameEngine.Graphics
         public Game3DObject Parent { get => _parent; set => _parent = value; }
         public List<Game3DObject> Children { get => _children; }
         public MeshObject Mesh { get => _mesh; }
+        public float Speed { get; set; }
         public ObjectCollision Collision 
         { 
             get => _collision; 
@@ -109,7 +110,7 @@ namespace GameEngine.Graphics
             return _components[key] as T;
         }
 
-        public void Update(float delta)
+        public virtual void Update(float delta)
         {
             AddScripts();
             foreach (Script script in _scripts)
